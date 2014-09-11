@@ -33,7 +33,7 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use Sulu\Bundle\Sales\ShippingBundle\Entity\Shipping as ShippingEntity;
 
 /**
- * Makes shippings available through a REST API
+ * Makes invoices available through a REST API
  *
  * @package Sulu\Bundle\Sales\OrderBundle\Controller
  */
@@ -89,7 +89,7 @@ class InvoiceController extends RestController implements ClassResourceInterface
             $locale = $this->getLocale($request);
 
             $status = $request->get('status');
-            $orderId= $request->get('orderId');
+            $orderId = $request->get('orderId');
             if ($status) {
                 $filter['status'] = $status;
             }
@@ -105,7 +105,7 @@ class InvoiceController extends RestController implements ClassResourceInterface
                 $factory = $this->get('sulu_core.doctrine_list_builder_factory');
 
                 /** @var DoctrineListBuilder $listBuilder */
-                $listBuilder = $factory->create(self::$shippingEntityName);
+                $listBuilder = $factory->create(self::$invoiceEntityName);
 
                 $restHelper->initializeListBuilder($listBuilder, $this->getManager()->getFieldDescriptors($locale));
 
@@ -116,7 +116,7 @@ class InvoiceController extends RestController implements ClassResourceInterface
                 $list = new ListRepresentation(
                     $listBuilder->execute(),
                     self::$entityKey,
-                    'get_shippings',
+                    'get_invoices',
                     $request->query->all(),
                     $listBuilder->getCurrentPage(),
                     $listBuilder->getLimit(),
@@ -139,10 +139,10 @@ class InvoiceController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * Retrieves and shows a shipping with the given ID
+     * Retrieves and shows an invoice with the given ID
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param integer $id shipping ID
+     * @param integer $id invoice ID
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getAction(Request $request, $id)
@@ -151,10 +151,10 @@ class InvoiceController extends RestController implements ClassResourceInterface
         $view = $this->responseGetById(
             $id,
             function ($id) use ($locale) {
-                /** @var Shipping $shipping */
-                $shipping = $this->getManager()->findByIdAndLocale($id, $locale);
+                /** @var Invoice $invoice */
+                $invoice = $this->getManager()->findByIdAndLocale($id, $locale);
 
-                return $shipping;
+                return $invoice;
             }
         );
 
@@ -165,145 +165,124 @@ class InvoiceController extends RestController implements ClassResourceInterface
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function shippedorderitemsAction(Request $request)
+    public function billedorderitemsAction(Request $request)
     {
         $orderId = $request->get('orderId');
-        $sum = $this->getManager()->getSumOfShippedItemsByOrderId($orderId);
+        $sum = $this->getManager()->getSumOfBilledItemsByOrderId($orderId);
         return $this->handleView($this->view($sum, 200));
     }
 
-    /**
-     * Creates and stores a new shipping.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function postAction(Request $request)
-    {
-        try {
-            $shipping= $this->getManager()->save(
-                $request->request->all(),
-                $this->getLocale($request),
-                $this->getUser()->getId()
-            );
-
-            $view = $this->view($shipping, 200);
-        } catch (ShippingDependencyNotFoundException $exc) {
-            $exception = new EntityNotFoundException($exc->getEntityName(), $exc->getId());
-            $view = $this->view($exception->toArray(), 400);
-        } catch (MissingShippingAttributeException $exc) {
-            $exception = new MissingArgumentException(self::$shippingEntityName, $exc->getAttribute());
-            $view = $this->view($exception->toArray(), 400);
-        }
-
-        return $this->handleView($view);
-    }
-
-    /**
-     * Change a shipping.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param integer $id shipping ID
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function putAction(Request $request, $id)
-    {
-        try {
-            $shipping = $this->getManager()->save(
-                $request->request->all(),
-                $this->getLocale($request),
-                $this->getUser()->getId(),
-                $id
-            );
-
-            $view = $this->view($shipping, 200);
-        } catch (ShippingNotFoundException $exc) {
-            $exception = new EntityNotFoundException($exc->getEntityName(), $exc->getId());
-            $view = $this->view($exception->toArray(), 404);
-        } catch (ShippingDependencyNotFoundException $exc) {
-            $exception = new EntityNotFoundException($exc->getEntityName(), $exc->getId());
-            $view = $this->view($exception->toArray(), 400);
-        } catch (MissingShippingAttributeException $exc) {
-            $exception = new MissingArgumentException(self::$shippingsEntityName, $exc->getAttribute());
-            $view = $this->view($exception->toArray(), 400);
-        } catch (ShippingException $exc) {
-            $exception = new RestException($exc->getMessage());
-            $view = $this->view($exception->toArray(), 400);
-        }
-
-        return $this->handleView($view);
-    }
-
-    /**
-     * @Post("/shippings/{id}")
-     */
-    public function postTriggerAction($id, Request $request)
-    {
-        $status = $request->get('action');
-        $em = $this->getDoctrine()->getManager();
-
-        try {
-            $shipping = $this->getManager()->findByIdAndLocale($id, $this->getLocale($request));
-
-            switch ($status) {
-                case 'deliverynote':
-                    $this->getManager()->convertStatus($shipping, ShippingStatus::STATUS_DELIVERY_NOTE);
-                    break;
-                case 'edit':
-                    $this->getManager()->convertStatus($shipping, ShippingStatus::STATUS_CREATED);
-                    break;
-                default:
-                    throw new RestException("Unrecognized status: " . $status);
-
-            }
-
-            $em->flush();
-            $view = $this->view($shipping, 200);
-        } catch (OrderNotFoundException $exc) {
-            $exception = new EntityNotFoundException($exc->getEntityName(), $exc->getId());
-            $view = $this->view($exception->toArray(), 404);
-        }
-
-        return $this->handleView($view);
-    }
-
-    /**
-     * Delete a shipping with the given id.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param integer $id shipping ID
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function deleteAction(Request $request, $id)
-    {
-        $locale = $this->getLocale($request);
-
-        $delete = function ($id) use ($locale) {
-            $this->getManager()->delete($id, $this->getUser()->getId());
-        };
-        $view = $this->responseDelete($id, $delete);
-
-        return $this->handleView($view);
-    }
-
 //    /**
-//     * returns field-descriptor if status
-//     * @return DoctrineFieldDescriptor
+//     * Creates and stores a new shipping.
+//     *
+//     * @param \Symfony\Component\HttpFoundation\Request $request
+//     * @return \Symfony\Component\HttpFoundation\Response
 //     */
-//    private function getStatusFieldDescriptor()
+//    public function postAction(Request $request)
 //    {
-//        return new DoctrineFieldDescriptor(
-//            'id',
-//            'status',
-//            self::$orderStatusEntityName,
-//            'salesorder.orders.status',
-//            array(
-//                self::$orderStatusEntityName => new DoctrineJoinDescriptor(
-//                        self::$orderStatusEntityName,
-//                        self::$orderEntityName . '.status'
-//                    )
-//            )
-//        );
+//        try {
+//            $shipping= $this->getManager()->save(
+//                $request->request->all(),
+//                $this->getLocale($request),
+//                $this->getUser()->getId()
+//            );
+//
+//            $view = $this->view($shipping, 200);
+//        } catch (ShippingDependencyNotFoundException $exc) {
+//            $exception = new EntityNotFoundException($exc->getEntityName(), $exc->getId());
+//            $view = $this->view($exception->toArray(), 400);
+//        } catch (MissingShippingAttributeException $exc) {
+//            $exception = new MissingArgumentException(self::$shippingEntityName, $exc->getAttribute());
+//            $view = $this->view($exception->toArray(), 400);
+//        }
+//
+//        return $this->handleView($view);
 //    }
-
+//
+//    /**
+//     * Change a shipping.
+//     *
+//     * @param \Symfony\Component\HttpFoundation\Request $request
+//     * @param integer $id shipping ID
+//     * @return \Symfony\Component\HttpFoundation\Response
+//     */
+//    public function putAction(Request $request, $id)
+//    {
+//        try {
+//            $shipping = $this->getManager()->save(
+//                $request->request->all(),
+//                $this->getLocale($request),
+//                $this->getUser()->getId(),
+//                $id
+//            );
+//
+//            $view = $this->view($shipping, 200);
+//        } catch (ShippingNotFoundException $exc) {
+//            $exception = new EntityNotFoundException($exc->getEntityName(), $exc->getId());
+//            $view = $this->view($exception->toArray(), 404);
+//        } catch (ShippingDependencyNotFoundException $exc) {
+//            $exception = new EntityNotFoundException($exc->getEntityName(), $exc->getId());
+//            $view = $this->view($exception->toArray(), 400);
+//        } catch (MissingShippingAttributeException $exc) {
+//            $exception = new MissingArgumentException(self::$shippingsEntityName, $exc->getAttribute());
+//            $view = $this->view($exception->toArray(), 400);
+//        } catch (ShippingException $exc) {
+//            $exception = new RestException($exc->getMessage());
+//            $view = $this->view($exception->toArray(), 400);
+//        }
+//
+//        return $this->handleView($view);
+//    }
+//
+//    /**
+//     * @Post("/shippings/{id}")
+//     */
+//    public function postTriggerAction($id, Request $request)
+//    {
+//        $status = $request->get('action');
+//        $em = $this->getDoctrine()->getManager();
+//
+//        try {
+//            $shipping = $this->getManager()->findByIdAndLocale($id, $this->getLocale($request));
+//
+//            switch ($status) {
+//                case 'deliverynote':
+//                    $this->getManager()->convertStatus($shipping, ShippingStatus::STATUS_DELIVERY_NOTE);
+//                    break;
+//                case 'edit':
+//                    $this->getManager()->convertStatus($shipping, ShippingStatus::STATUS_CREATED);
+//                    break;
+//                default:
+//                    throw new RestException("Unrecognized status: " . $status);
+//
+//            }
+//
+//            $em->flush();
+//            $view = $this->view($shipping, 200);
+//        } catch (OrderNotFoundException $exc) {
+//            $exception = new EntityNotFoundException($exc->getEntityName(), $exc->getId());
+//            $view = $this->view($exception->toArray(), 404);
+//        }
+//
+//        return $this->handleView($view);
+//    }
+//
+//    /**
+//     * Delete a shipping with the given id.
+//     *
+//     * @param \Symfony\Component\HttpFoundation\Request $request
+//     * @param integer $id shipping ID
+//     * @return \Symfony\Component\HttpFoundation\Response
+//     */
+//    public function deleteAction(Request $request, $id)
+//    {
+//        $locale = $this->getLocale($request);
+//
+//        $delete = function ($id) use ($locale) {
+//            $this->getManager()->delete($id, $this->getUser()->getId());
+//        };
+//        $view = $this->responseDelete($id, $delete);
+//
+//        return $this->handleView($view);
+//    }
 }
