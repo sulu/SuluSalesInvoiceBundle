@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+    <route id="invoice_navigation" path="/navigation/invoice">
+        <default key="_controller">SuluSalesInvoiceBundle:Navigation:invoice</default>
+    </route>
+
+    <route id="invoice_list" path="/template/invoice/list.html">
+        <default key="_controller">SuluSalesInvoiceBundle:Template:invoiceList</default>
+    </route>
+    <route id="invoice_form" path="/template/invoice/form.html">
+        <default key="_controller">SuluSalesInvoiceBundle:Template:invoiceForm</default>
+    </route>
+</routes>
