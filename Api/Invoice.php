@@ -1,6 +1,6 @@
 <?php
 
-namespace Sulu\Bundle\Sales\ShippingBundle\Api;
+namespace Sulu\Bundle\Sales\InvoiceBundle\Api;
 
 use JMS\Serializer\Annotation\VirtualProperty;
 use Sulu\Bundle\Sales\CoreBundle\Api\Item;
@@ -9,22 +9,22 @@ use Sulu\Component\Rest\ApiWrapper;
 use Hateoas\Configuration\Annotation\Relation;
 use JMS\Serializer\Annotation\SerializedName;
 use Sulu\Component\Security\UserInterface;
-use Sulu\Bundle\Sales\ShippingBundle\Entity\Shipping as ShippingEntity;
+use Sulu\Bundle\Sales\InvoiceBundle\Entity\Invoice as InvoiceEntity;
 
 /**
  * The Invoice class which will be exported to the API
  * @package Sulu\Bundle\Sales\InvoiceBundle\Api
- * @Relation("self", href="expr('/api/admin/shippings/' ~ object.getId())")
+ * @Relation("self", href="expr('/api/admin/invoices/' ~ object.getId())")
  */
 class Invoice extends ApiWrapper
 {
     /**
-     * @param InvoiceEntity $shipping The shipping to wrap
-     * @param string $locale The locale of this shipping
+     * @param InvoiceEntity $invoice The invoice to wrap
+     * @param string $locale The locale of this invoice
      */
-    public function __construct(InvoiceEntity $shipping, $locale)
+    public function __construct(InvoiceEntity $invoice, $locale)
     {
-        $this->entity = $shipping;
+        $this->entity = $invoice;
         $this->locale = $locale;
     }
 
@@ -52,24 +52,24 @@ class Invoice extends ApiWrapper
     }
 
     /**
-     * Set shippingNumber
+     * Set invoiceNumber
      *
-     * @param string $shippingNumber
+     * @param string $invoiceNumber
      * @return Invoice
      */
-    public function setInvoiceNumber($shippingNumber)
+    public function setInvoiceNumber($invoiceNumber)
     {
-        $this->entity->setInvoiceNumber($shippingNumber);
+        $this->entity->setInvoiceNumber($invoiceNumber);
 
         return $this;
     }
 
     /**
-     * Get shippingNumber
+     * Get invoiceNumber
      *
      * @return string
      * @VirtualProperty
-     * @SerializedName("shippingNumber")
+     * @SerializedName("invoiceNumber")
      */
     public function getInvoiceNumber()
     {
@@ -105,7 +105,7 @@ class Invoice extends ApiWrapper
      * Set termsOfDeliveryContent
      *
      * @param string $termsOfDeliveryContent
-     * @return Shipping
+     * @return Invoice
      */
     public function setTermsOfDeliveryContent($termsOfDeliveryContent)
     {
@@ -130,7 +130,7 @@ class Invoice extends ApiWrapper
      * Set width
      *
      * @param float $width
-     * @return Shipping
+     * @return Invoice
      */
     public function setWidth($width)
     {
@@ -155,7 +155,7 @@ class Invoice extends ApiWrapper
      * Set height
      *
      * @param float $height
-     * @return Shipping
+     * @return Invoice
      */
     public function setHeight($height)
     {
@@ -180,7 +180,7 @@ class Invoice extends ApiWrapper
      * Set length
      *
      * @param float $length
-     * @return Shipping
+     * @return Invoice
      *
      */
     public function setLength($length)
@@ -206,7 +206,7 @@ class Invoice extends ApiWrapper
      * Set weight
      *
      * @param float $weight
-     * @return Shipping
+     * @return Invoice
      */
     public function setWeight($weight)
     {
@@ -231,7 +231,7 @@ class Invoice extends ApiWrapper
      * Set trackingId
      *
      * @param string $trackingId
-     * @return Shipping
+     * @return Invoice
      */
     public function setTrackingId($trackingId)
     {
@@ -256,7 +256,7 @@ class Invoice extends ApiWrapper
      * Set trackingUrl
      *
      * @param string $trackingUrl
-     * @return Shipping
+     * @return Invoice
      */
     public function setTrackingUrl($trackingUrl)
     {
@@ -281,7 +281,7 @@ class Invoice extends ApiWrapper
      * Set commission
      *
      * @param string $commission
-     * @return Shipping
+     * @return Invoice
      */
     public function setCommission($commission)
     {
@@ -306,7 +306,7 @@ class Invoice extends ApiWrapper
      * Set note
      *
      * @param string $note
-     * @return Shipping
+     * @return Invoice
      */
     public function setNote($note)
     {
@@ -331,7 +331,7 @@ class Invoice extends ApiWrapper
      * Set created
      *
      * @param \DateTime $created
-     * @return Shipping
+     * @return Invoice
      */
     public function setCreated($created)
     {
@@ -356,7 +356,7 @@ class Invoice extends ApiWrapper
      * Set changed
      *
      * @param \DateTime $changed
-     * @return Shipping
+     * @return Invoice
      */
     public function setChanged($changed)
     {
@@ -381,7 +381,7 @@ class Invoice extends ApiWrapper
      * Set expectedDeliveryDate
      *
      * @param \DateTime $expectedDeliveryDate
-     * @return Shipping
+     * @return Invoice
      */
     public function setExpectedDeliveryDate($expectedDeliveryDate)
     {
@@ -418,7 +418,7 @@ class Invoice extends ApiWrapper
      * Set deliveryAddress
      *
      * @param \Sulu\Bundle\Sales\OrderBundle\Entity\OrderAddress $deliveryAddress
-     * @return Shipping
+     * @return Invoice
      */
     public function setDeliveryAddress(\Sulu\Bundle\Sales\OrderBundle\Entity\OrderAddress $deliveryAddress = null)
     {
@@ -440,30 +440,30 @@ class Invoice extends ApiWrapper
     }
 
     /**
-     * Add shippingItems
+     * Add invoiceItems
      *
-     * @param \Sulu\Bundle\Sales\ShippingBundle\Entity\ShippingItem $shippingItems
-     * @return Shipping
+     * @param \Sulu\Bundle\Sales\InvoiceBundle\Entity\InvoiceItem $invoiceItems
+     * @return Invoice
      */
-    public function addShippingItem(\Sulu\Bundle\Sales\ShippingBundle\Entity\ShippingItem $shippingItems)
+    public function addInvoiceItem(\Sulu\Bundle\Sales\InvoiceBundle\Entity\InvoiceItem $invoiceItems)
     {
-        $this->entity->addShippingItem($shippingItems);
+        $this->entity->addInvoiceItem($invoiceItems);
 
         return $this;
     }
 
     /**
-     * Remove shippingItems
+     * Remove invoiceItems
      *
-     * @param \Sulu\Bundle\Sales\ShippingBundle\Entity\ShippingItem $shippingItems
+     * @param \Sulu\Bundle\Sales\InvoiceBundle\Entity\InvoiceItem $invoiceItems
      */
-    public function removeShippingItem(\Sulu\Bundle\Sales\ShippingBundle\Entity\ShippingItem $shippingItems)
+    public function removeInvoiceItem(\Sulu\Bundle\Sales\InvoiceBundle\Entity\InvoiceItem $invoiceItems)
     {
-        $this->entity->removeShippingItem($shippingItems);
+        $this->entity->removeInvoiceItem($invoiceItems);
     }
 
     /**
-     * Get shippingItems
+     * Get invoiceItems
      *
      * @return Array
      * @VirtualProperty
@@ -472,8 +472,8 @@ class Invoice extends ApiWrapper
     public function getItems()
     {
         $items = array();
-        foreach ($this->entity->getShippingItems() as $shippingItem) {
-            $items[] = new ShippingItem($shippingItem, $this->locale);
+        foreach ($this->entity->getInvoiceItems() as $invoiceItem) {
+            $items[] = new InvoiceItem($invoiceItem, $this->locale);
         }
 
         return $items;
@@ -482,10 +482,10 @@ class Invoice extends ApiWrapper
     /**
      * Set status
      *
-     * @param \Sulu\Bundle\Sales\ShippingBundle\Entity\ShippingStatus $status
-     * @return Shipping
+     * @param \Sulu\Bundle\Sales\InvoiceBundle\Entity\InvoiceStatus $status
+     * @return Invoice
      */
-    public function setStatus(\Sulu\Bundle\Sales\ShippingBundle\Entity\ShippingStatus $status)
+    public function setStatus(\Sulu\Bundle\Sales\InvoiceBundle\Entity\InvoiceStatus $status)
     {
         $this->entity->setStatus($status);
 
@@ -495,20 +495,20 @@ class Invoice extends ApiWrapper
     /**
      * Get status
      *
-     * @return \Sulu\Bundle\Sales\ShippingBundle\Entity\ShippingStatus
+     * @return \Sulu\Bundle\Sales\InvoiceBundle\Entity\InvoiceStatus
      * @VirtualProperty
      * @SerializedName("status")
      */
     public function getStatus()
     {
-        return new ShippingStatus($this->entity->getStatus(), $this->locale);
+        return new InvoiceStatus($this->entity->getStatus(), $this->locale);
     }
 
     /**
      * Set termsOfDelivery
      *
      * @param \Sulu\Bundle\ContactBundle\Entity\TermsOfDelivery $termsOfDelivery
-     * @return Shipping
+     * @return Invoice
      */
     public function setTermsOfDelivery(\Sulu\Bundle\ContactBundle\Entity\TermsOfDelivery $termsOfDelivery = null)
     {
@@ -533,7 +533,7 @@ class Invoice extends ApiWrapper
      * Set order
      *
      * @param \Sulu\Bundle\Sales\OrderBundle\Entity\Order $order
-     * @return Shipping
+     * @return Invoice
      */
     public function setOrder(\Sulu\Bundle\Sales\OrderBundle\Entity\Order $order = null)
     {
@@ -558,7 +558,7 @@ class Invoice extends ApiWrapper
      * Set changer
      *
      * @param UserInterface $changer
-     * @return Shipping
+     * @return Invoice
      */
     public function setChanger(UserInterface $changer = null)
     {
@@ -568,37 +568,15 @@ class Invoice extends ApiWrapper
     }
 
     /**
-     * Get changer
-     *
-     * @return UserInterface
-     */
-    public function getChanger()
-    {
-        // TODO
-//        return $this->entity->changer;
-    }
-
-    /**
      * Set creator
      *
      * @param UserInterface $creator
-     * @return Shipping
+     * @return Invoice
      */
     public function setCreator(UserInterface $creator = null)
     {
         $this->entity->setCreator($creator);
 
         return $this;
-    }
-
-    /**
-     * Get creator
-     *
-     * @return UserInterface
-     */
-    public function getCreator()
-    {
-        // TODO
-//        return $this->entity->creator;
     }
 }
