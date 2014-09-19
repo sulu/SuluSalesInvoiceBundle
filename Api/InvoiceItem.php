@@ -97,15 +97,6 @@ class InvoiceItem extends ApiWrapper
         return $this;
     }
 
-//    /**
-//     * Get Invoice
-//     * @return \Sulu\Bundle\Sales\InvoiceBundle\Entity\Invoice
-//     */
-//    public function getInvoice()
-//    {
-//        return $this->entity->getInvoice();
-//    }
-
     /**
      * Set item
      *

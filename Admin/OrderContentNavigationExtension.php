@@ -1,6 +1,6 @@
 <?php
 
-namespace Sulu\Bundle\Sales\ShippingBundle\Admin;
+namespace Sulu\Bundle\Sales\InvoiceBundle\Admin;
 
 use Sulu\Bundle\AdminBundle\Navigation\ContentNavigationInterface;
 use Sulu\Bundle\AdminBundle\Navigation\ContentNavigationItem;
