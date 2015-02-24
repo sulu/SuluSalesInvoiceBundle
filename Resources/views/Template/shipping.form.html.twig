@@ -1,0 +1,100 @@
+<% var disabled = isEditable ? '' : 'disabled' %>
+
+<link rel="stylesheet" type="text/css" href="/bundles/sulusalescore/css/main.min.css"/>
+<div class="invoice-form-container <%= disabled %>">
+    <form id="invoice-form" class="form-horizontal">
+        <input type="hidden" data-mapper-property="id"/>
+
+        <div class="grid-row">
+
+            <div class="grid-row small changeListener">
+                <div class="grid-col-6">
+                    <div class="form-group">
+                        <label for="account" class="required"><%=translate('salescore.account')%></label>
+                        <div id="account" class="not-clickable"></div>
+                    </div>
+                </div>
+                <div class="grid-col-6">
+                    <div class="form-group">
+                        <label for="commission"><%=translate('salesorder.orders.commission')%></label>
+                        <input id="commission" class="form-element" type="text" data-mapper-property="commission" <%=
+                        disabled %>/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-row small changeListener">
+                <div class="grid-col-6">
+                    <div class="form-group">
+                        <label for="contact" class="required"><%=translate('salescore.contact')%></label>
+                        <div id="contact" class="not-clickable"></div>
+                    </div>
+                </div>
+                <div class="grid-col-6">
+                    <div class="form-group changeListener">
+                        <label for="invoice-number"><%=translate('salesinvoice.invoices.number')%></label>
+                        <input id="invoice-number" class="form-element" type="text" data-mapper-property="invoiceNumber"
+                        <%= disabled %>/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-row small">
+                <div class="grid-col-12">
+                    <div class="form-group">
+                        <label for="payment-address" class="required"><%=translate('address.payment')%></label>
+
+                        <div id="payment-address"
+                             data-aura-component="editable-data-row@sulusalescore"
+                             data-form="true"
+                             data-aura-view="address"
+                             data-mapper-property="paymentAddress"
+                             data-validation-required="true"
+                             data-aura-instance-name="payment-address"
+                             data-aura-disabled="<%= !isEditable %>"
+                             data-type="editableDataRow">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-row small changeListener">
+                <div class="grid-col-12">
+                    <div class="form-group">
+                        <label for="payment-terms-select"><%=translate('contact.termsOfPayment')%></label>
+
+                        <div id="payment-terms-select"
+                             data-aura-component="select@husky"
+                             data-aura-deselect-field="select.no-choice"
+                             data-aura-data='{{ termsOfPayment|json_encode()|raw }}'
+                             data-aura-default-label="<%=translate('public.please-choose')%>"
+                             data-aura-multiple-select="false"
+                             data-aura-instance-name="payment-terms"
+                             data-aura-pre-selected-elements="[]"
+                             data-aura-disabled="<%= !isEditable %>"
+                             data-type="husky-select"
+                             data-mapper-property="termsOfPayment"
+                             data-validation-required="false"
+                             data-form="true">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="changeListener">
+            <div id="invoice-items"
+                 data-aura-component="item-quantity-table@sulusalescore"
+                 data-aura-is-editable="<%= isEditable %>"
+                 data-aura-processed-items='<%= JSON.stringify(shippedOrderItems) %>'
+                 data-aura-items-data='<%= JSON.stringify(order.items) %>'
+                 data-form="true"
+                 data-type="itemTable"
+                 data-mapper-property="items">
+            </div>
+        </div>
+    </form>
+</div>
+
+{% block data %}
+
+{% endblock %}
